@@ -5,11 +5,11 @@ import java.util.Queue;
 import java.util.Scanner;
 
 
-public class LL1Scanner {
+public class LL1Lexer {
 	private Scanner scanner;
 	private Queue<Token> tokenBuffer;
 	
-	public LL1Scanner(File f) {
+	public LL1Lexer(File f) {
 		try {
 			scanner = new Scanner(f);
 			tokenBuffer = new LinkedList<Token>();

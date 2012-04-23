@@ -1,9 +1,7 @@
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.Scanner;
 
 
@@ -11,9 +9,8 @@ public class LL1Grammar {
 	private static Scanner grammarScanner;
 	private ArrayList<Terminal> terminals;
 	private ArrayList<Variable> variables;
-	private Variable start;
+	private Variable startVariable;
 	private List<Rule> rules;
-	private Map<Terminal, String> nonTerminalStrings;
 	
 	public LL1Grammar(File grammarDescription) {
 		try {
@@ -37,9 +34,9 @@ public class LL1Grammar {
 					variables.add(new Variable(line[i]));
 				}
 			} else if (line[0].equalsIgnoreCase("%Start")) {
-				start = variableForIdentifier(line[1]);
+				startVariable = variableForIdentifier(line[1]);
 				
-				if (start == null) {
+				if (startVariable == null) {
 					System.err.println("Critical Error: start non-terminal not in non-terminals list");
 				}
 			} else if (line[0].equalsIgnoreCase("%Rules")) {
@@ -157,7 +154,7 @@ public class LL1Grammar {
 		sb.append("\n");
 
 		sb.append("Start Variable: ");
-		sb.append(start);
+		sb.append(startVariable);
 		sb.append("\n");
 		
 		sb.append("Rules:\n");
@@ -167,5 +164,9 @@ public class LL1Grammar {
 		}
 		
 		return sb.toString();
+	}
+
+	public RuleElement getStartVariable() {
+		return startVariable;
 	}
 }

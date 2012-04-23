@@ -18,7 +18,7 @@ public class Token {
 		return TokenType.T_UNKNOWN;
 	}
 	
-	public String getString() {
+	public String toString() {
 		return string;
 	}
 	

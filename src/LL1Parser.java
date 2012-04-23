@@ -1,9 +1,12 @@
 import java.io.File;
+import java.util.List;
+import java.util.Stack;
 
 
 public class LL1Parser {
-	LL1Grammar grammar;
-	LL1Scanner scanner;
+	private LL1Grammar grammar;
+	private LL1ParsingTable parsingTable;
+	private LL1Lexer lexer;
 	
 	public static void main(String[] args) {
 		if (args.length == 2) {
@@ -11,7 +14,11 @@ public class LL1Parser {
 			File fileToParse = new File(args[1]);
 			
 			LL1Parser parser = new LL1Parser(grammarFile, fileToParse);
-			parser.start();
+			try {
+				parser.parse();
+			} catch (LL1ParseException e) {
+				e.printStackTrace();
+			}
 		} else {
 			System.err.println("Incorrect usage. Required argument filename not provided.");
 		}
@@ -19,14 +26,28 @@ public class LL1Parser {
 	
 	public LL1Parser(File grammarFile, File fileToParse) {
 		grammar = new LL1Grammar(grammarFile);
-		scanner = new LL1Scanner(fileToParse);
+		System.out.println(grammar);
+		parsingTable = new LL1ParsingTable(grammar);
+		lexer = new LL1Lexer(fileToParse);
 	}
 	
-	public void start() {
-		System.out.println(grammar);
+	public void parse() throws LL1ParseException {
+		Stack<RuleElement> parsingStack = new Stack<RuleElement>();
+		parsingStack.push(grammar.getStartVariable());
 		
-		while (scanner.hasNext()) {
-			System.out.println(scanner.next().getType());
+		while (lexer.hasNext()) {
+			Token token = lexer.next();
+			List<RuleElement> newRuleElements = parsingTable.getRuleElements(parsingStack.pop(), token.getType());
+			if (newRuleElements != null) {
+				if (!(newRuleElements.get(0) instanceof Epsilon)) {
+					for (int i = 0; i < newRuleElements.size(); i++) {
+						parsingStack.push(newRuleElements.get(i));
+					}
+				}
+			} else {
+				throw new LL1ParseException("Parsing failed with token " + token.getType());
+			}
+			System.out.println(lexer.next().getType());
 		}
 	}
 }
