@@ -80,7 +80,7 @@ public class LL1Grammar {
 				tailRuleRightSide.add(tail);
 				
 				Rule tailRule = new Rule(tail, tailRuleRightSide);
-				Rule tailEpsilonRule = new Rule(tail, new Epsilon());
+				Rule tailEpsilonRule = new Rule(tail, new EmptyString());
 				
 				newRules.add(tailRule);
 				newRules.add(tailEpsilonRule);
@@ -166,7 +166,15 @@ public class LL1Grammar {
 		return sb.toString();
 	}
 
-	public RuleElement getStartVariable() {
+	public Variable getStartVariable() {
 		return startVariable;
+	}
+
+	public List<Variable> getVariables() {
+		return variables;
+	}
+
+	public List<Rule> getRules() {
+		return rules;
 	}
 }

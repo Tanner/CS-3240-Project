@@ -13,4 +13,14 @@ public class RuleElement {
 	public String toString() {
 		return identifier;
 	}
+	
+	public boolean equals(Object o) {
+		if (o instanceof RuleElement) {
+			RuleElement other = (RuleElement)o;
+			
+			return other.identifier.equals(identifier);
+		}
+		
+		return false;
+	}
 }

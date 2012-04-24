@@ -39,7 +39,7 @@ public class LL1Parser {
 			Token token = lexer.next();
 			List<RuleElement> newRuleElements = parsingTable.getRuleElements(parsingStack.pop(), token.getType());
 			if (newRuleElements != null) {
-				if (!(newRuleElements.get(0) instanceof Epsilon)) {
+				if (!(newRuleElements.get(0) instanceof EmptyString)) {
 					for (int i = 0; i < newRuleElements.size(); i++) {
 						parsingStack.push(newRuleElements.get(i));
 					}
