@@ -6,28 +6,88 @@ import java.util.Map;
 
 
 public class LL1ParsingTable {
-	private Map<Variable, List<Terminal>> first;
-	private Map<Variable, List<Terminal>> follow;
-	private Map<RuleElement, Map<TokenType, List<RuleElement>>> table;
+	private Map<Variable, List<Production>> first;
+	private Map<Variable, List<Production>> follow;
+	private Map<Variable, Map<Terminal, List<RuleElement>>> table;
 
 	public LL1ParsingTable(LL1Grammar grammar) {
 		first = first(grammar.getRules());
 		System.out.println("First:");
 		for (Variable v : grammar.getVariables()) {
-			System.out.println(v + " " + first.get(v));
+			System.out.print(v);
+			List<Production> productions = first.get(v);
+			for (Production p : productions) {
+				System.out.print(" " + p.getTerminal());
+			}
+			System.out.println();
 		}
 		System.out.println();
 		
 		System.out.println("Follow:");
 		follow = follow(grammar.getRules(), first, grammar.getStartVariable());
 		for (Variable v : grammar.getVariables()) {
-			System.out.println(v + " " + follow.get(v));
+			System.out.print(v);
+			List<Production> productions = follow.get(v);
+			for (Production p : productions) {
+				System.out.print(" " + p.getTerminal());
+			}
+			System.out.println();
+		}
+		System.out.println();
+		
+		System.out.println("Table:");
+		table = generateParsingTable(grammar.getVariables(), first, follow);
+		String format = "%50s";
+		System.out.printf(format, "");
+		for (Terminal t : grammar.getTerminals()) {
+			System.out.printf(format, t);
+		}
+		System.out.println();
+		for (Variable v : grammar.getVariables()) {
+			System.out.printf(format, v);
+
+			for (Terminal t : grammar.getTerminals()) {
+				System.out.printf(format, table.get(v).get(t));
+			}
+			
+			System.out.println();
 		}
 		System.out.println();
 	}
 
-	private static Map<Variable, List<Terminal>> first(List<Rule> rules) {
-		HashMap<Variable, List<Terminal>> firstSet = new HashMap<Variable, List<Terminal>>();
+	private static Map<Variable, Map<Terminal, List<RuleElement>>> generateParsingTable(
+			List<Variable> variables,
+			Map<Variable, List<Production>> first,
+			Map<Variable, List<Production>> follow) {
+		Map<Variable, Map<Terminal, List<RuleElement>>> parsingTable = new HashMap<Variable, Map<Terminal, List<RuleElement>>>();
+		
+		for (Variable v : variables) {
+			Map<Terminal, List<RuleElement>> column = new HashMap<Terminal, List<RuleElement>>();
+			
+			List<Production> firstOfVariable = first.get(v);
+			
+			for (Production firstP : firstOfVariable) {
+				Terminal firstT = firstP.getTerminal();
+				if (firstT instanceof EmptyString) {
+					List<Production> followOfVariable = follow.get(v);
+					
+					for (Production followP : followOfVariable) {
+						Terminal followT = followP.getTerminal();
+						column.put(followT, followP.getRuleElements());
+					}
+				} else {
+					column.put(firstT, firstP.getRuleElements());
+				}
+			}
+			
+			parsingTable.put(v, column);
+		}
+		
+		return parsingTable;
+	}
+
+	private static Map<Variable, List<Production>> first(List<Rule> rules) {
+		HashMap<Variable, List<Production>> firstSet = new HashMap<Variable, List<Production>>();
 		
 		int i = -1;
 		boolean changed;
@@ -38,27 +98,28 @@ public class LL1ParsingTable {
 			for (Rule r : rules) {
 				Variable v = r.getLeftSide();
 				
-				List<Terminal> firstTerminalList;
+				List<Production> firstTerminalList;
 				if (firstSet.containsKey(v)) {
 					firstTerminalList = firstSet.get(v);
 				} else {
-					firstTerminalList = new ArrayList<Terminal>();
+					firstTerminalList = new ArrayList<Production>();
 				}
 				
 				for (RuleElement re : r.getRightSide()) {
 					if (re instanceof Terminal) {
-						if (!firstTerminalList.contains(re)) {
-							firstTerminalList.add((Terminal)re);
+						if (!Production.productionListContainsTerminal(firstTerminalList, (Terminal)re)) {
+							firstTerminalList.add(new Production((Terminal)re, r.getRightSide()));
 							changed = true;
 						}
 						break;
 					} else if (i > 0 && re instanceof Variable) {
-						List<Terminal> variableFirstList = firstSet.get(re); 
+						List<Production> variableFirstList = firstSet.get(re); 
 						
 						if (variableFirstList != null && variableFirstList.size() > 0) {
-							for (Terminal t : variableFirstList) {
-								if (!firstTerminalList.contains(t)) {
-									firstTerminalList.add(t);
+							for (Production p : variableFirstList) {
+								Terminal t = p.getTerminal();
+								if (!Production.productionListContainsTerminal(firstTerminalList, t)) {
+									firstTerminalList.add(new Production(t, r.getRightSide()));
 									changed = true;
 								}
 							}
@@ -70,7 +131,7 @@ public class LL1ParsingTable {
 				}
 				
 				if (i > 0 && firstTerminalList.size() == 0) {
-					firstTerminalList.add(new EmptyString());
+					firstTerminalList.add(new Production(new EmptyString(), r.getRightSide()));
 					changed = true;
 				}
 				
@@ -86,11 +147,12 @@ public class LL1ParsingTable {
 		return firstSet;
 	}
 
-	private static Map<Variable, List<Terminal>> follow(List<Rule> rules, Map<Variable, List<Terminal>> first, Variable startVariable) {
-		HashMap<Variable, List<Terminal>> followSet = new HashMap<Variable, List<Terminal>>();
+	private static Map<Variable, List<Production>> follow(List<Rule> rules, Map<Variable, List<Production>> first, Variable startVariable) {
+		HashMap<Variable, List<Production>> followSet = new HashMap<Variable, List<Production>>();
 		
-		List<Terminal> startVariableTerminalList = new ArrayList<Terminal>();
-		startVariableTerminalList.add(new Terminal("$"));
+		List<Production> startVariableTerminalList = new ArrayList<Production>();
+		Production startProduction = new Production(new Terminal("$"), null);
+		startVariableTerminalList.add(startProduction);
 		followSet.put(startVariable, startVariableTerminalList);
 		
 		boolean changed;
@@ -103,33 +165,34 @@ public class LL1ParsingTable {
 					if (re instanceof Variable) {
 						Variable v = (Variable)re;
 						
-						List<Terminal> followTerminalList;
+						List<Production> followTerminalList;
 						if (followSet.containsKey(v)) {
 							followTerminalList = followSet.get(v);
 						} else {
-							followTerminalList = new ArrayList<Terminal>();
+							followTerminalList = new ArrayList<Production>();
 						}
 						
 						int k = j + 1;
 						for (k = j + 1; k < r.getRightSide().size(); k++) {
 							if (r.getRightSide().get(k) instanceof Variable) {
 								RuleElement nextVariable = r.getRightSide().get(k);
-								List<Terminal> firstOfNextVariable = first.get(nextVariable);
+								List<Production> firstOfNextVariable = first.get(nextVariable);
 								
-								for (Terminal t : firstOfNextVariable) {
-									if (!(t instanceof EmptyString) && !(followTerminalList.contains(t))) {
-										followTerminalList.add(t);
+								for (Production p : firstOfNextVariable) {
+									Terminal t = p.getTerminal();
+									if (!(t instanceof EmptyString) && !Production.productionListContainsTerminal(followTerminalList, t)) {
+										followTerminalList.add(new Production(t, r.getRightSide()));
 										changed = true;
 									}									
 								}
 								
-								if (!firstOfNextVariable.contains(new EmptyString())) {
+								if (!Production.productionListContainsTerminal(firstOfNextVariable, new EmptyString())) {
 									break;
 								}
 							} else if (r.getRightSide().get(k) instanceof Terminal) {
 								Terminal t = (Terminal)r.getRightSide().get(k);
-								if (!followTerminalList.contains(t)) {
-									followTerminalList.add(t);
+								if (!Production.productionListContainsTerminal(followTerminalList, t)) {
+									followTerminalList.add(new Production(t, r.getRightSide()));
 									changed = true;
 								}
 								
@@ -138,14 +201,15 @@ public class LL1ParsingTable {
 						}
 						
 						if (k == r.getRightSide().size()) {
-							List<Terminal> followOfVariable = followSet.get(r.getLeftSide());
+							List<Production> followOfVariable = followSet.get(r.getLeftSide());
 							
 							if (followOfVariable == null) {
 								changed = true;
 							} else {
-								for (Terminal t : followOfVariable) {
-									if (!(followTerminalList.contains(t))) {
-										followTerminalList.add(t);
+								for (Production p : followOfVariable) {
+									Terminal t = p.getTerminal();
+									if (!Production.productionListContainsTerminal(followTerminalList, t)) {
+										followTerminalList.add(new Production(t, r.getRightSide()));
 										changed = true;
 									}									
 								}
@@ -166,8 +230,8 @@ public class LL1ParsingTable {
 		return followSet;
 	}
 
-	public List<RuleElement> getRuleElements(RuleElement n, TokenType t) {
-		return null;
+	public List<RuleElement> getRuleElements(Variable v, TokenType t) {
+		return table.get(v).get(new Terminal(t.getIdentifier()));
 	}
 	
 }

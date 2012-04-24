@@ -37,17 +37,22 @@ public class LL1Parser {
 		
 		while (lexer.hasNext()) {
 			Token token = lexer.next();
-			List<RuleElement> newRuleElements = parsingTable.getRuleElements(parsingStack.pop(), token.getType());
-			if (newRuleElements != null) {
-				if (!(newRuleElements.get(0) instanceof EmptyString)) {
-					for (int i = 0; i < newRuleElements.size(); i++) {
-						parsingStack.push(newRuleElements.get(i));
+			RuleElement re = parsingStack.pop();
+			if (re instanceof Variable) {
+				Variable v = (Variable)re;
+				List<RuleElement> newRuleElements = parsingTable.getRuleElements(v, token.getType());
+				
+				if (newRuleElements != null) {
+					if (!(newRuleElements.get(0) instanceof EmptyString)) {
+						for (int i = 0; i < newRuleElements.size(); i++) {
+							parsingStack.push(newRuleElements.get(i));
+						}
 					}
+				} else {
+					throw new LL1ParseException("Parsing failed with token " + token.getType());
 				}
-			} else {
-				throw new LL1ParseException("Parsing failed with token " + token.getType());
+				System.out.println(lexer.next().getType());
 			}
-			System.out.println(lexer.next().getType());
 		}
 	}
 }

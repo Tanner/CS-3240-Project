@@ -27,6 +27,7 @@ public class LL1Grammar {
 				for (int i = 1; i < line.length; i++) {
 					terminals.add(new Terminal(line[i]));
 				}
+				terminals.add(new Terminal("$"));
 			} else if (line[0].equalsIgnoreCase("%Non-terminals")) {
 				variables = new ArrayList<Variable>();
 				
@@ -176,5 +177,9 @@ public class LL1Grammar {
 
 	public List<Rule> getRules() {
 		return rules;
+	}
+
+	public List<Terminal> getTerminals() {
+		return terminals;
 	}
 }
