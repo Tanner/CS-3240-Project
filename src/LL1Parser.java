@@ -35,24 +35,33 @@ public class LL1Parser {
 		Stack<RuleElement> parsingStack = new Stack<RuleElement>();
 		parsingStack.push(grammar.getStartVariable());
 		
-		while (lexer.hasNext()) {
-			Token token = lexer.next();
+		Token token = lexer.next();
+		while (!parsingStack.isEmpty()) {
 			RuleElement re = parsingStack.pop();
 			if (re instanceof Variable) {
 				Variable v = (Variable)re;
 				List<RuleElement> newRuleElements = parsingTable.getRuleElements(v, token.getType());
 				
 				if (newRuleElements != null) {
-					if (!(newRuleElements.get(0) instanceof EmptyString)) {
-						for (int i = 0; i < newRuleElements.size(); i++) {
-							parsingStack.push(newRuleElements.get(i));
-						}
+					for (int i = newRuleElements.size() - 1; i >= 0; i--) {
+						parsingStack.push(newRuleElements.get(i));
 					}
 				} else {
-					throw new LL1ParseException("Parsing failed with token " + token.getType());
+					throw new LL1ParseException("Parsing failed with token of type " + token.getType() + " and stack: " + parsingStack);
 				}
-				System.out.println(lexer.next().getType());
+			} else if (re instanceof EmptyString) {
+				
+			} else if (re instanceof Terminal) {
+				Terminal t = (Terminal)re;
+				TokenType tokenType = TokenType.tokenWithIdentifier(t.toString());
+				if (tokenType == token.getType()) {
+					token = lexer.next();
+				} else {
+					throw new LL1ParseException("Unexpected " + token.getType() + " (expected "+ tokenType + ")");
+				}
 			}
 		}
+		
+		System.out.println("Successful parse!");
 	}
 }

@@ -27,7 +27,7 @@ public class LL1Lexer {
 		StringBuilder sb = new StringBuilder();
 		for (int i = 0; i < s.length(); i++) {
 			char c = s.charAt(i);
-			if (c == ' ' || c == ',' || c == ';' || c == '&' || c == '+' || c == '-') {
+			if (c == ' ' || c == ',' || c == ';' || c == '&' || c == '+' || c == '-' || c == '(' || c == ')') {
 				if (sb.toString().length() > 0) {
 					tokenBuffer.add(new Token(sb.toString()));
 				}
@@ -44,6 +44,10 @@ public class LL1Lexer {
 	}
 	
 	public Token next() {
+		if (!scanner.hasNext()) {
+			return null;
+		}
+		
 		while (tokenBuffer.isEmpty()) {
 			fillTokenBuffer(scanner.next());
 		}

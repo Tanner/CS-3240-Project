@@ -9,8 +9,11 @@ public class LL1ParsingTable {
 	private Map<Variable, List<Production>> first;
 	private Map<Variable, List<Production>> follow;
 	private Map<Variable, Map<Terminal, List<RuleElement>>> table;
+	private LL1Grammar grammar;
 
 	public LL1ParsingTable(LL1Grammar grammar) {
+		this.grammar = grammar;
+		
 		first = first(grammar.getRules());
 		System.out.println("First:");
 		for (Variable v : grammar.getVariables()) {
@@ -209,7 +212,9 @@ public class LL1ParsingTable {
 								for (Production p : followOfVariable) {
 									Terminal t = p.getTerminal();
 									if (!Production.productionListContainsTerminal(followTerminalList, t)) {
-										followTerminalList.add(new Production(t, r.getRightSide()));
+										List<RuleElement> emptyStringRuleElementList = new ArrayList<RuleElement>();
+										emptyStringRuleElementList.add(new EmptyString());
+										followTerminalList.add(new Production(t, emptyStringRuleElementList));
 										changed = true;
 									}									
 								}
@@ -231,7 +236,10 @@ public class LL1ParsingTable {
 	}
 
 	public List<RuleElement> getRuleElements(Variable v, TokenType t) {
-		return table.get(v).get(new Terminal(t.getIdentifier()));
+		Map<Terminal, List<RuleElement>> column = table.get(v);
+		Terminal terminal = grammar.terminalForIdentifier(t.getIdentifier());
+		List<RuleElement> ruleElements = column.get(terminal);
+		return ruleElements;
 	}
 	
 }
