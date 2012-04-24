@@ -111,7 +111,7 @@ public class LL1ParsingTable {
 						}
 						
 						int k = j + 1;
-						while (k < r.getRightSide().size()) {
+						for (k = j + 1; k < r.getRightSide().size(); k++) {
 							if (r.getRightSide().get(k) instanceof Variable) {
 								RuleElement nextVariable = r.getRightSide().get(k);
 								List<Terminal> firstOfNextVariable = first.get(nextVariable);
@@ -120,7 +120,11 @@ public class LL1ParsingTable {
 									if (!(t instanceof EmptyString) && !(followTerminalList.contains(t))) {
 										followTerminalList.add(t);
 										changed = true;
-									}
+									}									
+								}
+								
+								if (!firstOfNextVariable.contains(new EmptyString())) {
+									break;
 								}
 							} else if (r.getRightSide().get(k) instanceof Terminal) {
 								Terminal t = (Terminal)r.getRightSide().get(k);
@@ -128,8 +132,24 @@ public class LL1ParsingTable {
 									followTerminalList.add(t);
 									changed = true;
 								}
+								
+								break;
 							}
-							break;
+						}
+						
+						if (k == r.getRightSide().size()) {
+							List<Terminal> followOfVariable = followSet.get(r.getLeftSide());
+							
+							if (followOfVariable == null) {
+								changed = true;
+							} else {
+								for (Terminal t : followOfVariable) {
+									if (!(followTerminalList.contains(t))) {
+										followTerminalList.add(t);
+										changed = true;
+									}									
+								}
+							}
 						}
 						
 						if (followSet.containsKey(v)) {
