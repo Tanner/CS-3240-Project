@@ -51,7 +51,7 @@ public class LL1Lexer {
 	}
 	
 	public Token next() {
-		if (!scanner.hasNext()) {
+		if (!scanner.hasNext() && tokenBuffer.isEmpty()) {
 			return null;
 		}
 		

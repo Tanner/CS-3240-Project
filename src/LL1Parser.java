@@ -59,10 +59,14 @@ public class LL1Parser {
 				Terminal t = (Terminal)re;
 				TokenType tokenType = TokenType.tokenWithIdentifier(t.toString());
 				if (tokenType == token.getType()) {
-					token = lexer.next();
+					if (parsingStack.isEmpty()) {
+						// if token is matched and parsing stack is empty, no need to go further
+						break;
+					}
 					if (verbose) {
 						System.out.println("Parsed " + token);
 					}
+					token = lexer.next();
 				} else {
 					throw new LL1ParseException("Unexpected " + token.getType() + " (expected "+ tokenType + ")");
 				}
