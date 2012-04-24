@@ -33,6 +33,13 @@ public class LL1Lexer {
 				}
 				tokenBuffer.add(new Token(new Character(c).toString()));
 				sb.setLength(0);
+			} else if (c == ':' && i + 1 < s.length() && s.charAt(i + 1) == '=') {
+				if (sb.toString().length() > 0) {
+					tokenBuffer.add(new Token(sb.toString()));
+				}
+				tokenBuffer.add(new Token(":="));
+				i++;
+				sb.setLength(0);
 			} else {
 				sb.append(c);
 				

@@ -1,3 +1,5 @@
 BEGIN
     a := 3;
+    b := 4;
+    READ (x);
 END

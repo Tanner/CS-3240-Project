@@ -7,6 +7,7 @@ public class LL1Parser {
 	private LL1Grammar grammar;
 	private LL1ParsingTable parsingTable;
 	private LL1Lexer lexer;
+	private boolean verbose = true;
 	
 	public static void main(String[] args) {
 		if (args.length == 2) {
@@ -37,6 +38,9 @@ public class LL1Parser {
 		
 		Token token = lexer.next();
 		while (!parsingStack.isEmpty()) {
+			if (verbose) {
+				System.out.println(parsingStack);
+			}
 			RuleElement re = parsingStack.pop();
 			if (re instanceof Variable) {
 				Variable v = (Variable)re;
@@ -56,6 +60,9 @@ public class LL1Parser {
 				TokenType tokenType = TokenType.tokenWithIdentifier(t.toString());
 				if (tokenType == token.getType()) {
 					token = lexer.next();
+					if (verbose) {
+						System.out.println("Parsed " + token);
+					}
 				} else {
 					throw new LL1ParseException("Unexpected " + token.getType() + " (expected "+ tokenType + ")");
 				}
