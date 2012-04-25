@@ -8,12 +8,16 @@ public class LL1Parser {
 	private LL1ParsingTable parsingTable;
 	private LL1Lexer lexer;
 	
-	public static final boolean VERBOSE = false;
+	public static boolean VERBOSE = false;
 	
 	public static void main(String[] args) {
-		if (args.length == 2) {
+		if (args.length >= 2 && args.length <= 3) {
 			File grammarFile = new File(args[0]);
 			File fileToParse = new File(args[1]);
+			
+			if (args.length >= 3 && args[2].equals("-pt")) {
+				VERBOSE = true;
+			}
 			
 			LL1Parser parser = new LL1Parser(grammarFile, fileToParse);
 			try {
