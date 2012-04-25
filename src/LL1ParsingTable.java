@@ -15,47 +15,56 @@ public class LL1ParsingTable {
 		this.grammar = grammar;
 		
 		first = first(grammar.getRules());
-		System.out.println("First:");
-		for (Variable v : grammar.getVariables()) {
-			System.out.print(v);
-			List<Production> productions = first.get(v);
-			for (Production p : productions) {
-				System.out.print(" " + p.getTerminal());
+		
+		if (LL1Parser.VERBOSE) {
+			System.out.println("First:");
+			for (Variable v : grammar.getVariables()) {
+				System.out.print(v);
+				List<Production> productions = first.get(v);
+				for (Production p : productions) {
+					System.out.print(" " + p.getTerminal());
+				}
+				System.out.println();
 			}
 			System.out.println();
 		}
-		System.out.println();
 		
-		System.out.println("Follow:");
 		follow = follow(grammar.getRules(), first, grammar.getStartVariable());
-		for (Variable v : grammar.getVariables()) {
-			System.out.print(v);
-			List<Production> productions = follow.get(v);
-			for (Production p : productions) {
-				System.out.print(" " + p.getTerminal());
-			}
-			System.out.println();
-		}
-		System.out.println();
 		
-		System.out.println("Table:");
-		table = generateParsingTable(grammar.getVariables(), first, follow);
-		String format = "%50s";
-		System.out.printf(format, "");
-		for (Terminal t : grammar.getTerminals()) {
-			System.out.printf(format, t);
-		}
-		System.out.println();
-		for (Variable v : grammar.getVariables()) {
-			System.out.printf(format, v);
-
-			for (Terminal t : grammar.getTerminals()) {
-				System.out.printf(format, table.get(v).get(t));
+		if (LL1Parser.VERBOSE) {
+			System.out.println("Follow:");
+			for (Variable v : grammar.getVariables()) {
+				System.out.print(v);
+				List<Production> productions = follow.get(v);
+				for (Production p : productions) {
+					System.out.print(" " + p.getTerminal());
+				}
+				System.out.println();
 			}
-			
 			System.out.println();
 		}
-		System.out.println();
+		
+		table = generateParsingTable(grammar.getVariables(), first, follow);
+		
+		if (LL1Parser.VERBOSE) {
+			System.out.println("Table:");
+			String format = "%50s";
+			System.out.printf(format, "");
+			for (Terminal t : grammar.getTerminals()) {
+				System.out.printf(format, t);
+			}
+			System.out.println();
+			for (Variable v : grammar.getVariables()) {
+				System.out.printf(format, v);
+	
+				for (Terminal t : grammar.getTerminals()) {
+					System.out.printf(format, table.get(v).get(t));
+				}
+				
+				System.out.println();
+			}
+			System.out.println();
+		}
 	}
 
 	private static Map<Variable, Map<Terminal, List<RuleElement>>> generateParsingTable(

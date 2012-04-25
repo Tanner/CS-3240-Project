@@ -7,7 +7,8 @@ public class LL1Parser {
 	private LL1Grammar grammar;
 	private LL1ParsingTable parsingTable;
 	private LL1Lexer lexer;
-	private boolean verbose = true;
+	
+	public static final boolean VERBOSE = false;
 	
 	public static void main(String[] args) {
 		if (args.length == 2) {
@@ -21,13 +22,17 @@ public class LL1Parser {
 				e.printStackTrace();
 			}
 		} else {
-			System.err.println("Incorrect usage. Required argument filename not provided.");
+			System.err.println("Incorrect usage. Required arguments: [grammar file] [file to parse]");
 		}
 	}
 	
 	public LL1Parser(File grammarFile, File fileToParse) {
 		grammar = new LL1Grammar(grammarFile);
-		System.out.println(grammar);
+		
+		if (VERBOSE) {
+			System.out.println(grammar);
+		}
+		
 		parsingTable = new LL1ParsingTable(grammar);
 		lexer = new LL1Lexer(fileToParse);
 	}
@@ -38,7 +43,7 @@ public class LL1Parser {
 		
 		Token token = lexer.next();
 		while (!parsingStack.isEmpty()) {
-			if (verbose) {
+			if (VERBOSE) {
 				System.out.println(parsingStack);
 			}
 			RuleElement re = parsingStack.pop();
@@ -63,7 +68,8 @@ public class LL1Parser {
 						// if token is matched and parsing stack is empty, no need to go further
 						break;
 					}
-					if (verbose) {
+					
+					if (VERBOSE) {
 						System.out.println("Parsed " + token);
 					}
 					token = lexer.next();
