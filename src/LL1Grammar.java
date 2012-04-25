@@ -65,6 +65,7 @@ public class LL1Grammar {
 		}
 		
 		removeLeftRecursion();
+		removeLeftFactoring();
 	}
 	
 	public void removeLeftRecursion() {
@@ -90,6 +91,83 @@ public class LL1Grammar {
 				for (Rule sibling : siblingRules) {
 					sibling.addToRightSide(tail);
 				}
+			} else {
+				newRules.add(rule);
+			}
+		}
+		
+		rules = newRules;
+	}
+	
+	public void removeLeftFactoring() {
+		ArrayList<Rule> newRules = new ArrayList<Rule>();
+		ArrayList<Rule> processedRules = new ArrayList<Rule>();
+		
+		for (Rule rule : rules) {
+			if (processedRules.contains(rule)) {
+				continue;
+			}
+			
+			// Find all rules where the left side is the same
+			ArrayList<Rule> similarRules = new ArrayList<Rule>();
+			for (Rule aRule : rules) {
+				if (aRule.getLeftSide().equals(rule.getLeftSide())) {
+					similarRules.add(aRule);
+				}
+			}
+			
+			// Find all rules from the left side set that have the same first right side variable / terminal
+			ArrayList<Rule> commonRules = new ArrayList<Rule>();
+			for (Rule aRule : similarRules) {
+				for (Rule bRule : similarRules) {
+					if (!bRule.equals(aRule)) {
+						if (aRule.getRightSide().get(0).equals(bRule.getRightSide().get(0))) {
+							if (!commonRules.contains(aRule)) {
+								commonRules.add(aRule);
+							}
+							
+							commonRules.add(bRule);
+						}
+					}
+				}
+				
+				if (commonRules.size() > 0) {
+					break;
+				}
+			}
+			
+			if (commonRules.size() > 0) {				
+				Variable leftSideVariable = commonRules.get(0).getLeftSide();
+				
+				// Create a new master rule that contains the common right side value plus the newVariable
+				Variable newVariable = new Variable(leftSideVariable.toString() + "'");
+				variables.add(newVariable);
+				
+				ArrayList<RuleElement> rightSideList = new ArrayList<RuleElement>();
+				rightSideList.add(commonRules.get(0).getRightSide().get(0));
+				rightSideList.add(newVariable);
+				
+				Rule newMasterRule = new Rule(leftSideVariable, rightSideList);
+				newRules.add(newMasterRule);
+												
+				// Create the newVariable rule(s) for all the commonRules (minus the common right side value)
+				for (Rule aRule : commonRules) {
+					rightSideList = new ArrayList<RuleElement>();
+
+					List<RuleElement> aRuleRightSide = aRule.getRightSide();
+					if (aRuleRightSide.size() == 1) {
+						rightSideList.add(new EmptyString());
+					} else {
+						for (int i = 1; i < aRuleRightSide.size(); i++) {
+							rightSideList.add(aRuleRightSide.get(i));
+						}
+					}
+					
+					Rule newVariableRule = new Rule(newVariable, rightSideList);
+					newRules.add(newVariableRule);
+				}
+								
+				processedRules.addAll(commonRules);
 			} else {
 				newRules.add(rule);
 			}
