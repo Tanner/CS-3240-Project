@@ -31,7 +31,11 @@ public class LL1Parser {
 	}
 	
 	public LL1Parser(File grammarFile, File fileToParse) {
-		grammar = new LL1Grammar(grammarFile);
+		try {
+			grammar = new LL1Grammar(grammarFile);
+		} catch (LL1GrammarException e) {
+			e.printStackTrace();
+		}
 		
 		if (VERBOSE) {
 			System.out.println(grammar);

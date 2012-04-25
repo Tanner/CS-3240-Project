@@ -12,13 +12,14 @@ public class LL1Grammar {
 	private Variable startVariable;
 	private List<Rule> rules;
 	
-	public LL1Grammar(File grammarDescription) {
+	public LL1Grammar(File grammarDescription) throws LL1GrammarException {
 		try {
 			grammarScanner = new Scanner(grammarDescription);
 		} catch (FileNotFoundException e) {
 			e.printStackTrace();
 		}
 		
+		int lineCount = 1;
 		while (grammarScanner.hasNext()) {
 			String[] line = grammarScanner.nextLine().split(" ");
 			if (line[0].equalsIgnoreCase("%Tokens")) {
@@ -44,7 +45,12 @@ public class LL1Grammar {
 				rules = new ArrayList<Rule>();
 				
 				while (grammarScanner.hasNext()) {
+					lineCount++;
 					String[] ruleLine = grammarScanner.nextLine().split(" ");
+					
+					if (ruleLine[0].charAt(0) != '<') {
+						throw new LL1GrammarException("Unexpected " + ruleLine[0] + " on line " + lineCount);
+					}
 					
 					Variable leftSide = variableForIdentifier(ruleLine[0]);
 					ArrayList<RuleElement> rightSide = new ArrayList<RuleElement>();
@@ -61,7 +67,11 @@ public class LL1Grammar {
 					
 					rules.add(new Rule(leftSide, rightSide));
 				}
+			} else {
+				throw new LL1GrammarException("Unexpected " + line[0] + " on line " + lineCount);
 			}
+			
+			lineCount++;
 		}
 		
 		removeLeftRecursion();
