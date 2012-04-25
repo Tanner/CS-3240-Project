@@ -73,6 +73,10 @@ public class LL1Parser {
 			}
 		}
 		
+		if (lexer.hasNext()) {
+			throw new LL1ParseException("Parsing ended with input remaining");
+		}
+		
 		System.out.println("Successful parse!");
 	}
 }
