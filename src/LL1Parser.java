@@ -32,7 +32,7 @@ public class LL1Parser {
 		lexer = new LL1Lexer(fileToParse);
 	}
 	
-	public void parse() throws LL1ParseException {
+	public boolean parse() throws LL1ParseException {
 		Stack<RuleElement> parsingStack = new Stack<RuleElement>();
 		parsingStack.push(grammar.getStartVariable());
 		
@@ -78,5 +78,6 @@ public class LL1Parser {
 		}
 		
 		System.out.println("Successful parse!");
+		return true;
 	}
 }
