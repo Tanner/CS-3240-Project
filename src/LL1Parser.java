@@ -13,7 +13,7 @@ public class LL1Parser {
 	public static boolean VERBOSE = false;
 	
 	/**
-	 * Main method which requires two CLI arguments - grammar file and file to parse. An optional third "-pt" argument turns on verbose mode. 
+	 * Main method which requires two CLI arguments - grammar file and file to parse. An optional third "-v" argument turns on verbose mode. 
 	 * @param args CLI arguments
 	 */
 	public static void main(String[] args) {
@@ -21,7 +21,7 @@ public class LL1Parser {
 			File grammarFile = new File(args[0]);
 			File fileToParse = new File(args[1]);
 			
-			if (args.length >= 3 && args[2].equals("-pt")) {
+			if (args.length >= 3 && args[2].equals("-v")) {
 				VERBOSE = true;
 			}
 			
@@ -32,7 +32,7 @@ public class LL1Parser {
 				e.printStackTrace();
 			}
 		} else {
-			System.err.println("Incorrect usage. Required arguments: [grammar file] [file to parse]");
+			System.err.println("Incorrect usage. Required arguments: [grammar file] [file to parse]\nOptional third argument \"-v\" available for verbose.");
 		}
 	}
 	
