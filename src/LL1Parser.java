@@ -2,7 +2,9 @@ import java.io.File;
 import java.util.List;
 import java.util.Stack;
 
-
+/**
+ * LL1 Parser that determines whether or not an example file is valid with a given grammar.
+ */
 public class LL1Parser {
 	private LL1Grammar grammar;
 	private LL1ParsingTable parsingTable;
@@ -10,6 +12,10 @@ public class LL1Parser {
 	
 	public static boolean VERBOSE = false;
 	
+	/**
+	 * Main method which requires two CLI arguments - grammar file and file to parse. An optional third "-pt" argument turns on verbose mode. 
+	 * @param args CLI arguments
+	 */
 	public static void main(String[] args) {
 		if (args.length >= 2 && args.length <= 3) {
 			File grammarFile = new File(args[0]);
@@ -30,6 +36,11 @@ public class LL1Parser {
 		}
 	}
 	
+	/**
+	 * Constructs a new LL1 Parser. Creates the grammar, parsing table, and the lexer.
+	 * @param grammarFile Grammar file
+	 * @param fileToParse Sample file of the language
+	 */
 	public LL1Parser(File grammarFile, File fileToParse) {
 		try {
 			grammar = new LL1Grammar(grammarFile);
@@ -45,6 +56,11 @@ public class LL1Parser {
 		lexer = new LL1Lexer(fileToParse);
 	}
 	
+	/**
+	 * Parse the sample file.
+	 * @return Boolean of success
+	 * @throws LL1ParseException
+	 */
 	public boolean parse() throws LL1ParseException {
 		Stack<RuleElement> parsingStack = new Stack<RuleElement>();
 		parsingStack.push(grammar.getStartVariable());
@@ -70,6 +86,8 @@ public class LL1Parser {
 					throw new LL1ParseException("Parsing failed with token of type " + token.getType() + " and stack: " + parsingStack);
 				}
 			} else if (re instanceof Terminal && !(re instanceof EmptyString)) {
+				// Nothing important goes on here
+			} else if (re instanceof Terminal) {
 				Terminal t = (Terminal)re;
 				TokenType tokenType = TokenType.tokenWithIdentifier(t.toString());
 				if (tokenType == token.getType()) {
