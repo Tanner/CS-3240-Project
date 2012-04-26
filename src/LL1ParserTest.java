@@ -19,6 +19,11 @@ public class LL1ParserTest {
 	public void testLL1ParserTiny() throws LL1ParseException {
 		testGrammar("tests/tiny/grammar.txt", "tests/tiny/test.txt");
 	}
+	
+	@Test
+	public void testLL1ParserTinyPrecedence() throws LL1ParseException {
+		testGrammar("tests/tiny_precedence/grammar.txt", "tests/tiny_precedence/test.txt");
+	}
 
 	public void testGrammar(String grammarPath, String pathToParse) throws LL1ParseException {
 		LL1Parser parser = new LL1Parser(new File(grammarPath), new File(pathToParse));
