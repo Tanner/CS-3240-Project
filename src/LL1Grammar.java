@@ -4,7 +4,9 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Scanner;
 
-
+/**
+ * LL1 Grammar made up with a list of Terminals, list of Variables, list of Rules, and a start Variable.
+ */
 public class LL1Grammar {
 	private static Scanner grammarScanner;
 	private ArrayList<Terminal> terminals;
@@ -12,6 +14,10 @@ public class LL1Grammar {
 	private Variable startVariable;
 	private List<Rule> rules;
 	
+	/**
+	 * Construct a new LL1 Grammar by parsing the description of the grammar.
+	 * @param grammarDescription File which contains the description of the grammar.
+	 */
 	public LL1Grammar(File grammarDescription) throws LL1GrammarException {
 		try {
 			grammarScanner = new Scanner(grammarDescription);
@@ -20,9 +26,13 @@ public class LL1Grammar {
 		}
 		
 		int lineCount = 1;
+		
+		// Parse through each line of the grammar description file
 		while (grammarScanner.hasNext()) {
 			String[] line = grammarScanner.nextLine().split(" ");
+			
 			if (line[0].equalsIgnoreCase("%Tokens")) {
+				// If we encounter the %Tokens line, generate the list of Tokens
 				terminals = new ArrayList<Terminal>();
 				
 				for (int i = 1; i < line.length; i++) {
@@ -30,18 +40,21 @@ public class LL1Grammar {
 				}
 				terminals.add(new Terminal("$"));
 			} else if (line[0].equalsIgnoreCase("%Non-terminals")) {
+				// If we encounter the %Non-Terminals line, generate the list of Variables
 				variables = new ArrayList<Variable>();
 				
 				for (int i = 1; i < line.length; i++) {
 					variables.add(new Variable(line[i]));
 				}
 			} else if (line[0].equalsIgnoreCase("%Start")) {
+				// If we encounter the %Start line, set the start Variable
 				startVariable = variableForIdentifier(line[1]);
 				
 				if (startVariable == null) {
 					System.err.println("Critical Error: start non-terminal not in non-terminals list");
 				}
 			} else if (line[0].equalsIgnoreCase("%Rules")) {
+				// Once we encounter %Rules, start creating the rules
 				rules = new ArrayList<Rule>();
 				
 				while (grammarScanner.hasNext()) {
@@ -54,10 +67,10 @@ public class LL1Grammar {
 					
 					Variable leftSide = variableForIdentifier(ruleLine[0]);
 					ArrayList<RuleElement> rightSide = new ArrayList<RuleElement>();
-					// start at two two skip colon
+					// Start at two two skip colon
 					for (int i = 2; i < ruleLine.length; i++) {
 						if (ruleLine[i].equals("|")) {
-							// new rule because of OR
+							// New rule because of OR
 							rules.add(new Rule(leftSide, rightSide));
 							rightSide = new ArrayList<RuleElement>();
 						} else {
@@ -74,21 +87,32 @@ public class LL1Grammar {
 			lineCount++;
 		}
 		
+		// Remove left recursion and left factoring
 		removeLeftRecursion();
 		removeLeftFactoring();
 	}
 	
+	/**
+	 * Remove left recursion from the grammar.
+	 */
 	public void removeLeftRecursion() {
 		ArrayList<Rule> newRules = new ArrayList<Rule>();
+		
 		for (Rule rule : rules) {
-			if (rule.hasLeftRecursion()) {				
+			if (rule.hasLeftRecursion()) {		
+				// Only applies to rules that have left recursion
+				
+				// Create a new rule with a similar left side as the old rule
 				String tailVariableIdentifier = rule.getLeftSide().getIdentifier().replace(">", "_tail>");
 				Variable tail = new Variable(tailVariableIdentifier);
 				variables.add(tail);
+
+				// Add RuleElements from the old rule's right side that are the non-recursive part (i.e. start from the 2nd rule)
 				List<RuleElement> tailRuleRightSide = new ArrayList<RuleElement>();
 				for (int i = 1; i < rule.getRightSide().size(); i++) {
 					tailRuleRightSide.add(rule.getRightSide().get(i));
 				}
+				
 				tailRuleRightSide.add(tail);
 				
 				Rule tailRule = new Rule(tail, tailRuleRightSide);
@@ -98,10 +122,12 @@ public class LL1Grammar {
 				newRules.add(tailEpsilonRule);
 				
 				List<Rule> siblingRules = rulesWithLeftSide(rule.getLeftSide());
+				
 				for (Rule sibling : siblingRules) {
 					sibling.addToRightSide(tail);
 				}
 			} else {
+				// If the rule does not have left recursion, keep it around
 				newRules.add(rule);
 			}
 		}
@@ -109,6 +135,9 @@ public class LL1Grammar {
 		rules = newRules;
 	}
 	
+	/**
+	 * Remove left factoring from the grammar.
+	 */
 	public void removeLeftFactoring() {
 		ArrayList<Rule> newRules = new ArrayList<Rule>();
 		ArrayList<Rule> processedRules = new ArrayList<Rule>();
@@ -186,6 +215,11 @@ public class LL1Grammar {
 		rules = newRules;
 	}
 	
+	/**
+	 * Determine Rules with the same left side Variable.
+	 * @param v Variable to test
+	 * @return Rules that have the same left side as the Variable given
+	 */
 	public List<Rule> rulesWithLeftSide(Variable v) {
 		ArrayList<Rule> rulesWithLeftSide = new ArrayList<Rule>();
 		
@@ -198,6 +232,11 @@ public class LL1Grammar {
 		return rulesWithLeftSide;
 	}
 	
+	/**
+	 * Determine the RuleElement for a String identifier.
+	 * @param identifier String identifier
+	 * @return RuleElement that matches the given identifier
+	 */
 	public RuleElement ruleElementForIdentifier(String identifier) {
 		RuleElement re = variableForIdentifier(identifier);
 		if (re == null) {
@@ -207,6 +246,11 @@ public class LL1Grammar {
 		return re;
 	}
 	
+	/**
+	 * Return the Variable that matches the given String identifier.
+	 * @param identifier String identifier
+	 * @return Variable that has the same identifier as the one given
+	 */
 	public Variable variableForIdentifier(String identifier) {
 		for (Variable v : variables) {
 			if (v.getIdentifier().equalsIgnoreCase(identifier)) {
@@ -217,6 +261,11 @@ public class LL1Grammar {
 		return null;
 	}
 	
+	/**
+	 * Return the Terminal that matches the given String identifier.
+	 * @param identifier String identifier
+	 * @return Terminal that has the same identifier as the one given
+	 */
 	public Terminal terminalForIdentifier(String identifier) {
 		for (Terminal t : terminals) {
 			if (t.getIdentifier().equalsIgnoreCase(identifier)) {
@@ -226,7 +275,40 @@ public class LL1Grammar {
 		
 		return null;
 	}
+
+	/**
+	 * Return the start Variable.
+	 * @return Start Variable
+	 */
+	public Variable getStartVariable() {
+		return startVariable;
+	}
+
+	/**
+	 * Return the list of Variables.
+	 * @return List of Variables
+	 */
+	public List<Variable> getVariables() {
+		return variables;
+	}
+
+	/**
+	 * Return the list of Rules.
+	 * @return List of Rules
+	 */
+	public List<Rule> getRules() {
+		return rules;
+	}
+
+	/**
+	 * Return the list of Terminals.
+	 * @return List of Terminals
+	 */
+	public List<Terminal> getTerminals() {
+		return terminals;
+	}
 	
+	@Override
 	public String toString() {
 		StringBuilder sb = new StringBuilder();
 		
@@ -253,21 +335,5 @@ public class LL1Grammar {
 		}
 		
 		return sb.toString();
-	}
-
-	public Variable getStartVariable() {
-		return startVariable;
-	}
-
-	public List<Variable> getVariables() {
-		return variables;
-	}
-
-	public List<Rule> getRules() {
-		return rules;
-	}
-
-	public List<Terminal> getTerminals() {
-		return terminals;
 	}
 }
