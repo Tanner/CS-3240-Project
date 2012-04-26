@@ -2,4 +2,5 @@ BEGIN
     a := 3;
     b := 4;
     READ (x);
+    c := 3+a+(3*4%3);
 END
