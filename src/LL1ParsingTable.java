@@ -3,17 +3,23 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-
-
+/**
+ * Creates an LL1 Parsing Table.
+ */
 public class LL1ParsingTable {
 	private Map<Variable, List<Production>> first;
 	private Map<Variable, List<Production>> follow;
 	private Map<Variable, Map<Terminal, List<RuleElement>>> table;
 	private LL1Grammar grammar;
 
+	/**
+	 * Constructs and builds a new LL1 Parsing Table.
+	 * @param grammar Given LL1 Grammar to build the table with.
+	 */
 	public LL1ParsingTable(LL1Grammar grammar) {
 		this.grammar = grammar;
 		
+		// First you must determine the First set
 		first = first(grammar.getRules());
 		
 		if (LL1Parser.VERBOSE) {
@@ -29,6 +35,7 @@ public class LL1ParsingTable {
 			System.out.println();
 		}
 		
+		// Then you can build the Follow set
 		follow = follow(grammar.getRules(), first, grammar.getStartVariable());
 		
 		if (LL1Parser.VERBOSE) {
@@ -44,6 +51,7 @@ public class LL1ParsingTable {
 			System.out.println();
 		}
 		
+		// Finally you can build the Parsing Table with the First and Follow sets
 		table = generateParsingTable(grammar.getVariables(), first, follow);
 		
 		if (LL1Parser.VERBOSE) {
