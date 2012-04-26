@@ -1,7 +1,7 @@
 import java.util.ArrayList;
 import java.util.List;
 
-/*
+/**
  * A Rule consists of a variable and a right side which consists of RuleElements.
  */
 public class Rule {
