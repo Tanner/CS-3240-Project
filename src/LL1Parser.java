@@ -55,6 +55,9 @@ public class LL1Parser {
 				System.out.println(parsingStack);
 			}
 			RuleElement re = parsingStack.pop();
+			if (VERBOSE) {
+				System.out.println("Popped " + re);
+			}
 			if (re instanceof Variable) {
 				Variable v = (Variable)re;
 				List<RuleElement> newRuleElements = parsingTable.getRuleElements(v, token.getType());
@@ -66,9 +69,7 @@ public class LL1Parser {
 				} else {
 					throw new LL1ParseException("Parsing failed with token of type " + token.getType() + " and stack: " + parsingStack);
 				}
-			} else if (re instanceof EmptyString) {
-				
-			} else if (re instanceof Terminal) {
+			} else if (re instanceof Terminal && !(re instanceof EmptyString)) {
 				Terminal t = (Terminal)re;
 				TokenType tokenType = TokenType.tokenWithIdentifier(t.toString());
 				if (tokenType == token.getType()) {
