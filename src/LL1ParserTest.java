@@ -19,6 +19,11 @@ public class LL1ParserTest {
 	}
 	
 	@Test
+	public void testLL1ParserBalancedParentheses() throws LL1ParseException {
+		testGrammar("tests/balanced_parentheses/grammar.txt", "tests/balanced_parentheses/test.txt");
+	}
+	
+	@Test
 	public void testLL1ParserTiny() throws LL1ParseException {
 		testGrammar("tests/tiny/grammar.txt", "tests/tiny/test.txt");
 	}

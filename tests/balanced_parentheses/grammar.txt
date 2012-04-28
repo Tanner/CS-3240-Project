@@ -1,0 +1,5 @@
+%Tokens LEFTPAR RIGHTPAR {epsilon}
+%Non-terminals <s>
+%Start <s>
+%Rules
+<s> : LEFTPAR <s> RIGHTPAR <s> | {epsilon}
