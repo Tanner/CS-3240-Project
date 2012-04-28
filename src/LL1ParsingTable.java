@@ -59,6 +59,10 @@ public class LL1ParsingTable {
 			String format = "%50s";
 			System.out.printf(format, "");
 			for (Terminal t : grammar.getTerminals()) {
+				if (t.isEmptyString()) {
+					continue;
+				}
+				
 				System.out.printf(format, t);
 			}
 			System.out.println();
@@ -66,6 +70,10 @@ public class LL1ParsingTable {
 				System.out.printf(format, v);
 	
 				for (Terminal t : grammar.getTerminals()) {
+					if (t.isEmptyString()) {
+						continue;
+					}
+					
 					System.out.printf(format, table.get(v).get(t));
 				}
 				
