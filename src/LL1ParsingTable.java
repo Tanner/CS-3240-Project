@@ -56,7 +56,19 @@ public class LL1ParsingTable {
 		
 		if (LL1Parser.VERBOSE) {
 			System.out.println("Table:");
-			String format = "%50s";
+			
+			int largestTextSize = 0;
+			for (Variable v : grammar.getVariables()) {
+				for (Terminal t : grammar.getTerminals()) {					
+					List entry = table.get(v).get(t);
+					if (entry != null) {
+						largestTextSize = entry.toString().length() > largestTextSize ? entry.toString().length() : largestTextSize;
+					}
+				}
+			}
+			largestTextSize += 2;
+			
+			String format = "%" + largestTextSize + "s";			
 			System.out.printf(format, "");
 			for (Terminal t : grammar.getTerminals()) {
 				if (t.isEmptyString()) {
