@@ -1,5 +1,7 @@
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.util.List;
+import java.util.Scanner;
 import java.util.Stack;
 
 /**
@@ -9,6 +11,7 @@ public class LL1Parser {
 	private LL1Grammar grammar;
 	private LL1ParsingTable parsingTable;
 	private LL1Lexer lexer;
+	private Scanner lexerOutputScanner;
 	
 	public static boolean VERBOSE = false;
 	
@@ -54,6 +57,12 @@ public class LL1Parser {
 		
 		parsingTable = new LL1ParsingTable(grammar);
 		lexer = new LL1Lexer(fileToParse);
+		
+		try {
+			lexerOutputScanner = new Scanner(lexer.getOutputFile());
+		} catch (FileNotFoundException e) {
+			e.printStackTrace();
+		}
 	}
 	
 	/**
@@ -65,7 +74,7 @@ public class LL1Parser {
 		Stack<RuleElement> parsingStack = new Stack<RuleElement>();
 		parsingStack.push(grammar.getStartVariable());
 		
-		Token token = lexer.next();
+		TokenType tokenType = TokenType.tokenWithIdentifier(lexerOutputScanner.next());
 		while (!parsingStack.isEmpty()) {
 			if (VERBOSE) {
 				System.out.println(parsingStack);
@@ -76,37 +85,35 @@ public class LL1Parser {
 			}
 			if (re instanceof Variable) {
 				Variable v = (Variable)re;
-				List<RuleElement> newRuleElements = parsingTable.getRuleElements(v, token.getType());
+				List<RuleElement> newRuleElements = parsingTable.getRuleElements(v, tokenType);
 				
 				if (newRuleElements != null) {
 					for (int i = newRuleElements.size() - 1; i >= 0; i--) {
 						parsingStack.push(newRuleElements.get(i));
 					}
 				} else {
-					throw new LL1ParseException("Parsing failed with token of type " + token.getType() + " and stack: " + parsingStack);
+					throw new LL1ParseException("Parsing failed with token of type " + tokenType + " and stack: " + parsingStack);
 				}
 			} else if (re instanceof Terminal && !(re instanceof EmptyString)) {
-				// Nothing important goes on here
-			} else if (re instanceof Terminal) {
-				Terminal t = (Terminal)re;
-				TokenType tokenType = TokenType.tokenWithIdentifier(t.toString());
-				if (tokenType == token.getType()) {
+				Terminal terminal = (Terminal)re;
+				TokenType parsingStackTokenType = TokenType.tokenWithIdentifier(terminal.toString());
+				if (parsingStackTokenType == tokenType) {
 					if (parsingStack.isEmpty()) {
 						// if token is matched and parsing stack is empty, no need to go further
 						break;
 					}
 					
 					if (VERBOSE) {
-						System.out.println("Parsed " + token);
+						System.out.println("Parsed " + tokenType);
 					}
-					token = lexer.next();
+					tokenType = TokenType.tokenWithIdentifier(lexerOutputScanner.next());
 				} else {
-					throw new LL1ParseException("Unexpected " + token.getType() + " (expected "+ tokenType + ")");
+					throw new LL1ParseException("Unexpected " + tokenType + " (expected "+ tokenType + ")");
 				}
 			}
 		}
 		
-		if (lexer.hasNext()) {
+		if (lexerOutputScanner.hasNext()) {
 			throw new LL1ParseException("Parsing ended with input remaining");
 		}
 		

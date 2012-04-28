@@ -1,5 +1,6 @@
 import java.io.File;
 import java.io.FileNotFoundException;
+import java.io.PrintWriter;
 import java.util.LinkedList;
 import java.util.Queue;
 import java.util.Scanner;
@@ -10,6 +11,7 @@ import java.util.Scanner;
 public class LL1Lexer {
 	private Scanner scanner;
 	private Queue<Token> tokenBuffer;
+	private File outputFile;
 	
 	/**
 	 * Construct a new LL1 LExer with the given file.
@@ -19,20 +21,13 @@ public class LL1Lexer {
 		try {
 			scanner = new Scanner(f);
 			tokenBuffer = new LinkedList<Token>();
-//			scanner.useDelimiter("( |,|;|%|\\+|-|:)");
+			outputFile = new File(f.getName() + ".tok");
+			writeToOutputFile();
 		} catch (FileNotFoundException e) {
 			e.printStackTrace();
 		}
 	}
-	
-	/**
-	 * Determine if the lexer has anything left to parse.
-	 * @return Return true when the Scanner has items left or the tokenBuffer is not empty
-	 */
-	public boolean hasNext() {
-		return scanner.hasNext() || !tokenBuffer.isEmpty();
-	}
-	
+
 	/**
 	 * Add a Token to the tokenBuffer based off the given String.
 	 * @param s String to tokenize and add to the tokenBuffer
@@ -67,11 +62,35 @@ public class LL1Lexer {
 		}
 	}
 	
+	private void writeToOutputFile() {
+		PrintWriter writer = null;
+		try {
+			writer = new PrintWriter(outputFile);
+		} catch (FileNotFoundException e) {
+			e.printStackTrace();
+		}
+		
+		while (hasNext()) {
+			writer.print(next().getType().getIdentifier() + " ");
+		}
+		
+		writer.flush();
+		writer.close();
+	}
+	
+	/**
+	 * Determine if the lexer has anything left to parse.
+	 * @return Return true when the Scanner has items left or the tokenBuffer is not empty
+	 */
+	private boolean hasNext() {
+		return scanner.hasNext() || !tokenBuffer.isEmpty();
+	}
+	
 	/**
 	 * Step through the Scanner until the tokenBuffer contains something.
 	 * @return Return the first Token inserted in the tokenBuffer
 	 */
-	public Token next() {
+	private Token next() {
 		if (!scanner.hasNext() && tokenBuffer.isEmpty()) {
 			return null;
 		}
@@ -81,5 +100,9 @@ public class LL1Lexer {
 		}
 		
 		return tokenBuffer.remove();
+	}
+
+	public File getOutputFile() {
+		return outputFile;
 	}
 }
