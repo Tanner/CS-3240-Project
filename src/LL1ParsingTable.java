@@ -88,7 +88,7 @@ public class LL1ParsingTable {
 			
 			for (Production firstP : firstOfVariable) {
 				Terminal firstT = firstP.getTerminal();
-				if (firstT instanceof EmptyString) {
+				if (firstT.isEmptyString()) {
 					List<Production> followOfVariable = follow.get(v);
 					
 					for (Production followP : followOfVariable) {
@@ -200,7 +200,7 @@ public class LL1ParsingTable {
 								
 								for (Production p : firstOfNextVariable) {
 									Terminal t = p.getTerminal();
-									if (!(t instanceof EmptyString) && !Production.productionListContainsTerminal(followTerminalList, t)) {
+									if (!t.isEmptyString() && !Production.productionListContainsTerminal(followTerminalList, t)) {
 										followTerminalList.add(new Production(t, r.getRightSide()));
 										changed = true;
 									}									

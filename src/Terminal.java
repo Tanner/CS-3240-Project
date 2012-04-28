@@ -24,4 +24,11 @@ public class Terminal extends RuleElement {
 		return TokenType.T_UNKNOWN;
 	}
 	
+	/**
+	 * Is this terminal the empty string?
+	 * @return Return true if the terminal is the empty string
+	 */
+	public boolean isEmptyString() {
+		return tokenType() == TokenType.T_EMPTY_STRING;
+	}
 }

@@ -94,7 +94,7 @@ public class LL1Parser {
 				} else {
 					throw new LL1ParseException("Parsing failed with token of type " + tokenType + " and stack: " + parsingStack);
 				}
-			} else if (re instanceof Terminal && !(re instanceof EmptyString)) {
+			} else if (re instanceof Terminal && !(((Terminal)re).isEmptyString())) {
 				Terminal terminal = (Terminal)re;
 				TokenType parsingStackTokenType = TokenType.tokenWithIdentifier(terminal.toString());
 				if (parsingStackTokenType == tokenType) {
