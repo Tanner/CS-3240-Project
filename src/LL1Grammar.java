@@ -336,4 +336,14 @@ public class LL1Grammar {
 		
 		return sb.toString();
 	}
+
+	public Terminal getEndTerminal() {
+		for (Terminal t : terminals) {
+			if (t.getIdentifier().equals("$")) {
+				return t;
+			}
+		}
+		
+		return null;
+	}
 }

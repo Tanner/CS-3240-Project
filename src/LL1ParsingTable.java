@@ -36,7 +36,7 @@ public class LL1ParsingTable {
 		}
 		
 		// Then you can build the Follow set
-		follow = follow(grammar.getRules(), first, grammar.getStartVariable());
+		follow = follow(grammar.getRules(), first, grammar.getStartVariable(), grammar.getEndTerminal());
 		
 		if (LL1Parser.VERBOSE) {
 			System.out.println("Follow:");
@@ -118,17 +118,17 @@ public class LL1ParsingTable {
 			for (Rule r : rules) {
 				Variable v = r.getLeftSide();
 				
-				List<Production> firstTerminalList;
+				List<Production> firstProductionList;
 				if (firstSet.containsKey(v)) {
-					firstTerminalList = firstSet.get(v);
+					firstProductionList = firstSet.get(v);
 				} else {
-					firstTerminalList = new ArrayList<Production>();
+					firstProductionList = new ArrayList<Production>();
 				}
 				
 				for (RuleElement re : r.getRightSide()) {
 					if (re instanceof Terminal) {
-						if (!Production.productionListContainsTerminal(firstTerminalList, (Terminal)re)) {
-							firstTerminalList.add(new Production((Terminal)re, r.getRightSide()));
+						if (!Production.productionListContainsTerminal(firstProductionList, (Terminal)re)) {
+							firstProductionList.add(new Production((Terminal)re, r.getRightSide()));
 							changed = true;
 						}
 						break;
@@ -138,8 +138,8 @@ public class LL1ParsingTable {
 						if (variableFirstList != null && variableFirstList.size() > 0) {
 							for (Production p : variableFirstList) {
 								Terminal t = p.getTerminal();
-								if (!Production.productionListContainsTerminal(firstTerminalList, t)) {
-									firstTerminalList.add(new Production(t, r.getRightSide()));
+								if (!Production.productionListContainsTerminal(firstProductionList, t)) {
+									firstProductionList.add(new Production(t, r.getRightSide()));
 									changed = true;
 								}
 							}
@@ -150,16 +150,16 @@ public class LL1ParsingTable {
 					}
 				}
 				
-				if (i > 0 && firstTerminalList.size() == 0) {
-					firstTerminalList.add(new Production(new EmptyString(), r.getRightSide()));
+				if (i > 0 && firstProductionList.size() == 0) {
+					firstProductionList.add(new Production(new EmptyString(), r.getRightSide()));
 					changed = true;
 				}
 				
 				if (firstSet.containsKey(v)) {
 					firstSet.remove(v);
-					firstSet.put(v, firstTerminalList);
+					firstSet.put(v, firstProductionList);
 				} else {
-					firstSet.put(v, firstTerminalList);
+					firstSet.put(v, firstProductionList);
 				}
 			}
 		} while (changed || i < 3);
@@ -167,11 +167,14 @@ public class LL1ParsingTable {
 		return firstSet;
 	}
 
-	private static Map<Variable, List<Production>> follow(List<Rule> rules, Map<Variable, List<Production>> first, Variable startVariable) {
+	private static Map<Variable, List<Production>> follow(List<Rule> rules, Map<Variable, List<Production>> first, Variable startVariable, Terminal endTerminal) {
 		HashMap<Variable, List<Production>> followSet = new HashMap<Variable, List<Production>>();
 		
 		List<Production> startVariableTerminalList = new ArrayList<Production>();
-		Production startProduction = new Production(new Terminal("$"), null);
+		List<RuleElement> emptyStringRuleElementList = new ArrayList<RuleElement>();
+		emptyStringRuleElementList.add(new EmptyString());
+		
+		Production startProduction = new Production(endTerminal, emptyStringRuleElementList);
 		startVariableTerminalList.add(startProduction);
 		followSet.put(startVariable, startVariableTerminalList);
 		
@@ -185,11 +188,11 @@ public class LL1ParsingTable {
 					if (re instanceof Variable) {
 						Variable v = (Variable)re;
 						
-						List<Production> followTerminalList;
+						List<Production> followProductionList;
 						if (followSet.containsKey(v)) {
-							followTerminalList = followSet.get(v);
+							followProductionList = followSet.get(v);
 						} else {
-							followTerminalList = new ArrayList<Production>();
+							followProductionList = new ArrayList<Production>();
 						}
 						
 						int k = j + 1;
@@ -200,8 +203,8 @@ public class LL1ParsingTable {
 								
 								for (Production p : firstOfNextVariable) {
 									Terminal t = p.getTerminal();
-									if (!t.isEmptyString() && !Production.productionListContainsTerminal(followTerminalList, t)) {
-										followTerminalList.add(new Production(t, r.getRightSide()));
+									if (!t.isEmptyString() && !Production.productionListContainsTerminal(followProductionList, t)) {
+										followProductionList.add(new Production(t, emptyStringRuleElementList));
 										changed = true;
 									}									
 								}
@@ -211,8 +214,8 @@ public class LL1ParsingTable {
 								}
 							} else if (r.getRightSide().get(k) instanceof Terminal) {
 								Terminal t = (Terminal)r.getRightSide().get(k);
-								if (!Production.productionListContainsTerminal(followTerminalList, t)) {
-									followTerminalList.add(new Production(t, r.getRightSide()));
+								if (!Production.productionListContainsTerminal(followProductionList, t)) {
+									followProductionList.add(new Production(t, emptyStringRuleElementList));
 									changed = true;
 								}
 								
@@ -228,10 +231,8 @@ public class LL1ParsingTable {
 							} else {
 								for (Production p : followOfVariable) {
 									Terminal t = p.getTerminal();
-									if (!Production.productionListContainsTerminal(followTerminalList, t)) {
-										List<RuleElement> emptyStringRuleElementList = new ArrayList<RuleElement>();
-										emptyStringRuleElementList.add(new EmptyString());
-										followTerminalList.add(new Production(t, emptyStringRuleElementList));
+									if (!Production.productionListContainsTerminal(followProductionList, t)) {
+										followProductionList.add(new Production(t, emptyStringRuleElementList));
 										changed = true;
 									}									
 								}
@@ -240,9 +241,9 @@ public class LL1ParsingTable {
 						
 						if (followSet.containsKey(v)) {
 							followSet.remove(v);
-							followSet.put(v, followTerminalList);
+							followSet.put(v, followProductionList);
 						} else {
-							followSet.put(v, followTerminalList);
+							followSet.put(v, followProductionList);
 						}	
 					}
 				}

@@ -44,7 +44,7 @@ public class LL1Parser {
 	 * @param grammarFile Grammar file
 	 * @param fileToParse Sample file of the language
 	 */
-	public LL1Parser(File grammarFile, File fileToParse) {
+ 	public LL1Parser(File grammarFile, File fileToParse) {
 		try {
 			grammar = new LL1Grammar(grammarFile);
 		} catch (LL1GrammarException e) {
@@ -106,7 +106,10 @@ public class LL1Parser {
 					if (VERBOSE) {
 						System.out.println("Parsed " + tokenType);
 					}
-					tokenType = TokenType.tokenWithIdentifier(lexerOutputScanner.next());
+					
+					if (lexerOutputScanner.hasNext()) {
+						tokenType = TokenType.tokenWithIdentifier(lexerOutputScanner.next());
+					}
 				} else {
 					throw new LL1ParseException("Unexpected " + tokenType + " (expected "+ parsingStackTokenType + ")");
 				}
