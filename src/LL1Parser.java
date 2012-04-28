@@ -97,7 +97,7 @@ public class LL1Parser {
 			} else if (re instanceof Terminal && !(((Terminal)re).isEmptyString())) {
 				Terminal terminal = (Terminal)re;
 				TokenType parsingStackTokenType = TokenType.tokenWithIdentifier(terminal.toString());
-				if (parsingStackTokenType == tokenType) {
+				if (parsingStackTokenType.equals(tokenType)) {
 					if (parsingStack.isEmpty()) {
 						// if token is matched and parsing stack is empty, no need to go further
 						break;
