@@ -108,7 +108,7 @@ public class LL1Parser {
 					}
 					tokenType = TokenType.tokenWithIdentifier(lexerOutputScanner.next());
 				} else {
-					throw new LL1ParseException("Unexpected " + tokenType + " (expected "+ tokenType + ")");
+					throw new LL1ParseException("Unexpected " + tokenType + " (expected "+ parsingStackTokenType + ")");
 				}
 			}
 		}
