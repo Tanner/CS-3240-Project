@@ -21,7 +21,7 @@ public class LL1Lexer {
 		try {
 			scanner = new Scanner(f);
 			tokenBuffer = new LinkedList<Token>();
-			outputFile = new File(f.getName() + ".tok");
+			outputFile = new File(f.getName().substring(0, f.getName().lastIndexOf('.')) + ".tok");
 			writeToOutputFile();
 		} catch (FileNotFoundException e) {
 			e.printStackTrace();
