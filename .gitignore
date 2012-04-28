@@ -24,3 +24,6 @@ local.properties
 
 # PDT-specific
 .buildpath
+
+# Project files
+*.tok
