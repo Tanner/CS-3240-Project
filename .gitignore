@@ -27,3 +27,6 @@ local.properties
 
 # Project files
 *.tok
+
+# OS X
+.DS_Store
