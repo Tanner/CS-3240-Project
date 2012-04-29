@@ -1,0 +1,7 @@
+%Tokens ID INTNUM LEFTPAR RIGHTPAR PLUS
+%Non-terminals <s> <f>
+%Start <s>
+%Rules
+<s> : LEFTPAR <f> PLUS <s> RIGHTPAR
+<s> : <f>
+<f> : ID | INTNUM
