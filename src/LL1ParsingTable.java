@@ -57,41 +57,37 @@ public class LL1ParsingTable {
 		if (LL1Parser.VERBOSE) {
 			System.out.println("Table:");
 			
-			int largestTextSize = 0;
-			for (Variable v : grammar.getVariables()) {
-				for (Terminal t : grammar.getTerminals()) {					
-					List<RuleElement> entry = table.get(v).get(t);
-					if (entry != null) {
-						largestTextSize = entry.toString().length() > largestTextSize ? entry.toString().length() : largestTextSize;
-					}
-				}
-			}
-			largestTextSize += 2;
+			List<Variable> variables = grammar.getVariables();
+			List<Terminal> terminals = grammar.getTerminals();
 			
-			String format = "%" + largestTextSize + "s";			
-			System.out.printf(format, "");
-			for (Terminal t : grammar.getTerminals()) {
-				if (t.isEmptyString()) {
-					continue;
-				}
-				
-				System.out.printf(format, t);
-			}
-			System.out.println();
-			for (Variable v : grammar.getVariables()) {
-				System.out.printf("%-" + largestTextSize + "s", v);
-	
-				for (Terminal t : grammar.getTerminals()) {
-					if (t.isEmptyString()) {
+			terminals.remove(new EmptyString());
+			
+			int numberVariables = variables.size();
+			int numberTerminals = terminals.size();
+			String[][] data = new String[numberVariables + 1][numberTerminals + 1];
+			
+			for (int r = 0; r < data.length; r++) {
+				for (int c = 0; c < data[r].length; c++) {
+					if (r == 0 && c == 0) {
+						data[r][c] = "";
 						continue;
+					} else if (r == 0) {
+						data[r][c] = terminals.get(c - 1).toString();
+					} else if (c == 0) {
+						data[r][c] = variables.get(r - 1).toString(); 
+					} else {
+						List<RuleElement> entry = table.get(variables.get(r - 1)).get(terminals.get(c - 1));
+						
+						if (entry != null) {
+							data[r][c] = entry.toString();
+						} else {
+							data[r][c] = "";
+						}
 					}
-					
-					System.out.printf(format, table.get(v).get(t));
 				}
-				
-				System.out.println();
 			}
-			System.out.println();
+			
+			System.out.println(Table.createTable(data, 2, true));
 		}
 	}
 
