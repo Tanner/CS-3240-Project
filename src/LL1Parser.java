@@ -96,7 +96,7 @@ public class LL1Parser {
 						parsingStack.push(newRuleElements.get(i));
 					}
 				} else {
-					throw new LL1ParseException("Parsing failed with token of type " + tokenType + " and stack: " + parsingStack);
+					throw new LL1ParseException("Parsing failed with token of type " + tokenType + " and variable " + re);
 				}
 			} else if (re instanceof Terminal && !(((Terminal)re).isEmptyString())) {
 				Terminal terminal = (Terminal)re;
