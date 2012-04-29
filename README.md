@@ -17,5 +17,7 @@ After successfully parsing a grammar, the program will create two files:
 * A tokenized version of the input file will be written in the current working directory with the extension of .tok.
 * A text file containing the parsing table.
 
+Note: The parsing table can get large easily, so do take note to disable word wrap.
+
 # Examples
 Example grammar files and files to parse can be found in the tests/ directory.
