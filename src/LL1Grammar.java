@@ -51,7 +51,7 @@ public class LL1Grammar {
 				startVariable = variableForIdentifier(line[1]);
 				
 				if (startVariable == null) {
-					System.err.println("Critical Error: start non-terminal not in non-terminals list");
+					throw new LL1GrammarException("Start variable was not declared");
 				}
 			} else if (line[0].equalsIgnoreCase("%Rules")) {
 				// Once we encounter %Rules, start creating the rules
@@ -66,6 +66,11 @@ public class LL1Grammar {
 					}
 					
 					Variable leftSide = variableForIdentifier(ruleLine[0]);
+					
+					if (leftSide == null) {
+						throw new LL1GrammarException("Variable " + ruleLine[0] + " referenced on line " + lineCount + " was not declared");
+					}
+					
 					ArrayList<RuleElement> rightSide = new ArrayList<RuleElement>();
 					// Start at two two skip colon
 					for (int i = 2; i < ruleLine.length; i++) {

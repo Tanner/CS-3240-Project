@@ -24,6 +24,12 @@ public class LL1ParserTest {
 	}
 	
 	@Test
+	public void testLL1ParserAddition() throws LL1ParseException {
+		testGrammar("tests/addition/grammar.txt", "tests/addition/simple.txt");
+		testGrammar("tests/addition/grammar.txt", "tests/addition/complex.txt");
+	}
+	
+	@Test
 	public void testLL1ParserTiny() throws LL1ParseException {
 		testGrammar("tests/tiny/grammar.txt", "tests/tiny/test.txt");
 	}

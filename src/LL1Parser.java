@@ -19,7 +19,7 @@ public class LL1Parser {
 	 * Main method which requires two CLI arguments - grammar file and input file. An optional third "-v" argument turns on verbose mode. 
 	 * @param args CLI arguments
 	 */
-	public static void main(String[] args) {
+	public static void main(String[] args) {		
 		if (args.length >= 2 && args.length <= 3) {
 			File grammarFile = new File(args[0]);
 			File fileToParse = new File(args[1]);
