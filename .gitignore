@@ -27,6 +27,7 @@ local.properties
 
 # Project files
 *.tok
+parsing_table.txt
 
 # OS X
 .DS_Store

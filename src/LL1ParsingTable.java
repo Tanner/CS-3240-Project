@@ -1,3 +1,5 @@
+import java.io.FileNotFoundException;
+import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -53,41 +55,51 @@ public class LL1ParsingTable {
 		
 		// Finally you can build the Parsing Table with the First and Follow sets
 		table = generateParsingTable(grammar.getVariables(), first, follow);
+				
+		List<Variable> variables = grammar.getVariables();
+		List<Terminal> terminals = grammar.getTerminals();
 		
-		if (LL1Parser.VERBOSE) {
-			System.out.println("Table:");
-			
-			List<Variable> variables = grammar.getVariables();
-			List<Terminal> terminals = grammar.getTerminals();
-			
-			terminals.remove(new EmptyString());
-			
-			int numberVariables = variables.size();
-			int numberTerminals = terminals.size();
-			String[][] data = new String[numberVariables + 1][numberTerminals + 1];
-			
-			for (int r = 0; r < data.length; r++) {
-				for (int c = 0; c < data[r].length; c++) {
-					if (r == 0 && c == 0) {
-						data[r][c] = "";
-						continue;
-					} else if (r == 0) {
-						data[r][c] = terminals.get(c - 1).toString();
-					} else if (c == 0) {
-						data[r][c] = variables.get(r - 1).toString(); 
+		terminals.remove(new EmptyString());
+		
+		int numberVariables = variables.size();
+		int numberTerminals = terminals.size();
+		String[][] data = new String[numberVariables + 1][numberTerminals + 1];
+		
+		for (int r = 0; r < data.length; r++) {
+			for (int c = 0; c < data[r].length; c++) {
+				if (r == 0 && c == 0) {
+					data[r][c] = "";
+					continue;
+				} else if (r == 0) {
+					data[r][c] = terminals.get(c - 1).toString();
+				} else if (c == 0) {
+					data[r][c] = variables.get(r - 1).toString(); 
+				} else {
+					List<RuleElement> entry = table.get(variables.get(r - 1)).get(terminals.get(c - 1));
+					
+					if (entry != null) {
+						data[r][c] = entry.toString();
 					} else {
-						List<RuleElement> entry = table.get(variables.get(r - 1)).get(terminals.get(c - 1));
-						
-						if (entry != null) {
-							data[r][c] = entry.toString();
-						} else {
-							data[r][c] = "";
-						}
+						data[r][c] = "";
 					}
 				}
 			}
-			
-			System.out.println(Table.createTable(data, 2, true));
+		}
+		
+		String tableText = Table.createTable(data, 2, true);
+		PrintWriter writer = null;
+		try {
+			writer = new PrintWriter("parsing_table.txt");
+			writer.print(tableText);
+			writer.flush();
+			writer.close();
+		} catch (FileNotFoundException e) {
+			e.printStackTrace();
+		}
+		
+		if (LL1Parser.VERBOSE) {
+			System.out.println("Table:");
+			System.out.println(tableText);
 		}
 	}
 
