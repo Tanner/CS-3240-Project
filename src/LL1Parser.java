@@ -74,7 +74,11 @@ public class LL1Parser {
 		Stack<RuleElement> parsingStack = new Stack<RuleElement>();
 		parsingStack.push(grammar.getStartVariable());
 		
-		TokenType tokenType = TokenType.tokenWithIdentifier(lexerOutputScanner.next());
+		TokenType tokenType = TokenType.T_END_INPUT;
+		if (lexerOutputScanner.hasNext()) {
+			tokenType = TokenType.tokenWithIdentifier(lexerOutputScanner.next());
+		}
+		
 		while (!parsingStack.isEmpty()) {
 			if (VERBOSE) {
 				System.out.println(parsingStack);
@@ -109,6 +113,8 @@ public class LL1Parser {
 					
 					if (lexerOutputScanner.hasNext()) {
 						tokenType = TokenType.tokenWithIdentifier(lexerOutputScanner.next());
+					} else {
+						tokenType = TokenType.T_END_INPUT;
 					}
 				} else {
 					throw new LL1ParseException("Unexpected " + tokenType + " (expected "+ parsingStackTokenType + ")");

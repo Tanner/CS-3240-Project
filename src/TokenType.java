@@ -18,6 +18,7 @@ public enum TokenType {
 	T_MULTIPLY("MULTIPLY", "\\*"),
 	T_MODULO("MODULO", "%"),
 	T_EMPTY_STRING("{epsilon}", ""),
+	T_END_INPUT("$", ""),
 	T_UNKNOWN("UNKNOWN", "\\w");
 	
 	private String identifier;
