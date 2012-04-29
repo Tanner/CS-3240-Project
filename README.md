@@ -2,9 +2,13 @@
 Created by Tanner Smith and Ryan Ashcraft.
 
 # Instructions
-To run the project, simply compile LL1Parser.java and run `java LL1Parser [path to grammar file] [path to file to input file]`.
+To run the project, simply compile `LL1Parser.java` and run `java LL1Parser [path to grammar file] [path to file to input file]`.
 
-For example: `cd src; javac LL1Parser.java; java LL1Parser ../tests/tiny_precedence/grammar.txt ../tests/tiny_precedence/test.txt`
+For example:
+
+    cd src/
+    javac LL1Parser.java
+    java LL1Parser ../tests/tiny_precedence/grammar.txt ../tests/tiny_precedence/test.txt
 
 An optional `-v` argument is an optional runtime argument that enable verbose mode. Verbose mode prints the revised grammar, the first and follow sets, the parsing table, and the parsing operations to the the console.
 
