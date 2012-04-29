@@ -60,7 +60,7 @@ public class LL1ParsingTable {
 			int largestTextSize = 0;
 			for (Variable v : grammar.getVariables()) {
 				for (Terminal t : grammar.getTerminals()) {					
-					List entry = table.get(v).get(t);
+					List<RuleElement> entry = table.get(v).get(t);
 					if (entry != null) {
 						largestTextSize = entry.toString().length() > largestTextSize ? entry.toString().length() : largestTextSize;
 					}
@@ -79,7 +79,7 @@ public class LL1ParsingTable {
 			}
 			System.out.println();
 			for (Variable v : grammar.getVariables()) {
-				System.out.printf(format, v);
+				System.out.printf("%-" + largestTextSize + "s", v);
 	
 				for (Terminal t : grammar.getTerminals()) {
 					if (t.isEmptyString()) {
