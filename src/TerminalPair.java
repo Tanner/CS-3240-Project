@@ -1,11 +1,11 @@
 import java.util.List;
 
 
-public class Production {
+public class TerminalPair {
 	private Terminal terminal;
 	private List<RuleElement> ruleElements;
 	
-	Production(Terminal terminal, List<RuleElement> ruleElements) {
+	TerminalPair(Terminal terminal, List<RuleElement> ruleElements) {
 		this.terminal = terminal;
 		this.ruleElements = ruleElements;
 	}
@@ -18,8 +18,8 @@ public class Production {
 		return ruleElements;
 	}
 	
-	public static boolean productionListContainsTerminal(List<Production> productions, Terminal terminal) {
-		for (Production p : productions) {
+	public static boolean productionListContainsTerminal(List<TerminalPair> productions, Terminal terminal) {
+		for (TerminalPair p : productions) {
 			if (p.getTerminal().equals(terminal)) {
 				return true;
 			}
@@ -27,4 +27,8 @@ public class Production {
 		
 		return false;
  	}
+	
+	public String toString() {
+		return terminal + ", " + ruleElements;
+	}
 }
