@@ -1,9 +1,19 @@
 import java.util.Formatter;
 
+/**
+ * Generate a pretty String that looks like a table.
+ */
 public class Table {
 	private static final String rowSeparator = "-";
 	private static final String columnSeparator = "|";
 	
+	/**
+	 * Generate a table from a 2D array of data.
+	 * @param data Data to insert in table
+	 * @param padding Padding between elements (left and right sides only)
+	 * @param headers Whether or not the first row and column are headers
+	 * @return String that is an ASCII table
+	 */
 	public static String createTable(String[][] data, int padding, boolean headers) {
 		int rows = data.length;
 		int cols = data[0].length;
@@ -61,6 +71,12 @@ public class Table {
 		return output.toString();
 	}
 	
+	/**
+	 * Repeat the given String a certain number of times.
+	 * @param string String to repeat
+	 * @param numberOfTimes Number of times to repeat the String
+	 * @return String repeated
+	 */
 	private static String repeatString(String string, int numberOfTimes) {
 		return new String(new char[numberOfTimes]).replace("\0", string);
 	}

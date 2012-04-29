@@ -103,6 +103,13 @@ public class LL1ParsingTable {
 		}
 	}
 
+	/**
+	 * Generate a parsing table given the variables and First/Follow sets.
+	 * @param variables Variables in the grammar
+	 * @param first First set from the grammar
+	 * @param follow Follow set from the grammar
+	 * @return Parsing table in a Map of Variables to another Map of Terminals to a List of Rule Elements
+	 */
 	private static Map<Variable, Map<Terminal, List<RuleElement>>> generateParsingTable(
 			List<Variable> variables,
 			Map<Variable, List<TerminalPair>> first,
@@ -134,6 +141,11 @@ public class LL1ParsingTable {
 		return parsingTable;
 	}
 
+	/**
+	 * Generate the First set from the Rules.
+	 * @param rules List of Rules.
+	 * @return First set in form of Variable to a TerminalPair List Map
+	 */
 	private static Map<Variable, List<TerminalPair>> first(List<Rule> rules) {
 		HashMap<Variable, List<TerminalPair>> firstSet = new HashMap<Variable, List<TerminalPair>>();
 		
@@ -195,6 +207,11 @@ public class LL1ParsingTable {
 		return firstSet;
 	}
 
+	/**
+	 * Generate the Follow set from the Rules.
+	 * @param rules List of Rules.
+	 * @return Follow set in form of Variable to a TerminalPair List Map
+	 */
 	private static Map<Variable, List<TerminalPair>> follow(List<Rule> rules, Map<Variable, List<TerminalPair>> first, Variable startVariable, Terminal endTerminal) {
 		HashMap<Variable, List<TerminalPair>> followSet = new HashMap<Variable, List<TerminalPair>>();
 		
@@ -281,11 +298,16 @@ public class LL1ParsingTable {
 		return followSet;
 	}
 
+	/**
+	 * Get the rule elements in a cell of the parsing table.
+	 * @param v Variable
+	 * @param t Terminal
+	 * @return List of RuleElements form the cell in the parsing table
+	 */
 	public List<RuleElement> getRuleElements(Variable v, TokenType t) {
 		Map<Terminal, List<RuleElement>> column = table.get(v);
 		Terminal terminal = grammar.terminalForIdentifier(t.getIdentifier());
 		List<RuleElement> ruleElements = column.get(terminal);
 		return ruleElements;
 	}
-	
 }
