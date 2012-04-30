@@ -7,10 +7,10 @@ the tokenized program to a file on the disk.
 Then we built the LL1Grammar class that scans in the grammar description and sets the start variable,
 terminals, non-terminals, and rules of the specified grammar. We built several classes to do this:
 	
-	* a Rule, which has a Variable for the left side and a list of RuleElements for the right side
-	* a RuleElement is the superclass of Variable and Terminal
-	* a Variable is a non-terminal
-	* a Terminal is a terminal
+* a Rule, which has a Variable for the left side and a list of RuleElements for the right side
+* a RuleElement is the superclass of Variable and Terminal
+* a Variable is a non-terminal
+* a Terminal is a terminal
 
 We wrote two methods in the LL1Grammar class to remove left recursion and perform left factoring on the grammar's rules.
 Any time there is an error that occurs when parsing the grammar description, an LL1GrammarException is thrown
