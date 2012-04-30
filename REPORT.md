@@ -12,7 +12,7 @@ terminals, non-terminals, and rules of the specified grammar. We built several c
 	* a Variable is a non-terminal
 	* a Terminal is a terminal
 
-We wrote two methods in the LL1Grammar class to remove left recursion and left factoring from the grammar's rules.
+We wrote two methods in the LL1Grammar class to remove left recursion and perform left factoring on the grammar's rules.
 Any time there is an error that occurs when parsing the grammar description, an LL1GrammarException is thrown
 with a string description of what went wrong.
 

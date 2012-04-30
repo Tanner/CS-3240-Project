@@ -94,7 +94,7 @@ public class LL1Grammar {
 		
 		// Remove left recursion and left factoring
 		removeLeftRecursion();
-		removeLeftFactoring();
+		performLeftFactoring();
 	}
 	
 	/**
@@ -141,9 +141,9 @@ public class LL1Grammar {
 	}
 	
 	/**
-	 * Remove left factoring from the grammar.
+	 * Perform left factoring on the grammar.
 	 */
-	public void removeLeftFactoring() {
+	public void performLeftFactoring() {
 		ArrayList<Rule> newRules = new ArrayList<Rule>();
 		ArrayList<Rule> processedRules = new ArrayList<Rule>();
 		
