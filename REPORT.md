@@ -1,3 +1,42 @@
+# Implementation
+We structured our LL1 parser into several object-oriented classes. We first constructed the LL1Lexer class,
+that simply scans in the input program file and for each token it matches it with a TokenType (which is an
+enumeration). This is done with a regular expression that is defined for each TokenType. This class outputs
+the tokenized program to a file on the disk.
+
+Then we built the LL1Grammar class that scans in the grammar description and sets the start variable,
+terminals, non-terminals, and rules of the specified grammar. We built several classes to do this:
+	
+	* a Rule, which has a Variable for the left side and a list of RuleElements for the right side
+	* a RuleElement is the superclass of Variable and Terminal
+	* a Variable is a non-terminal
+	* a Terminal is a terminal
+
+We wrote two methods in the LL1Grammar class to remove left recursion and left factoring from the grammar's rules.
+Any time there is an error that occurs when parsing the grammar description, an LL1GrammarException is thrown
+with a string description of what went wrong.
+
+From here, we provide the processed grammar instance as an argument in the LL1ParsingTable's constructor.
+The constructor constructs the first and follow sets from the grammar, and then uses those data structures
+to construct the parsing table (which is a Map of Variables to a Map of Terminals to a list of RuleElements).
+With each token that is added to each first set, we create a TerminalPair instance that pairs the terminal
+with the list of RuleElements that comes from the right-side of the rule that is responsible for that
+Terminal being in the first set. With the follow set, we do the same thing except we just pair each Terminal
+in the set with a list of RuleElements made up of only one EmptyString instance. This way, we can easily
+construct the parsing table by just inserting these lists of RuleElements into each appropriate cell, if
+necessary.
+
+The class that drives all of these classes is the LL1Parser class. After the parsing table instance has been
+fully constructed, the LL1Parser starts the actually parsing of the tokenized program. The parser has a stack
+and it begins by adding the grammar's start Variable and reading in a token from the tokenized file. It then
+uses the parsing table instance to look up what list of rule elements need to be added to the stack for the
+Variable (on the stack) and Terminal (from the tokenized file). This process continues. If the element popped
+off of the parsing stack is a Terminal, then that Terminal must match the token read in from the tokenized
+program. If these two Terminals are of the same TokenType, then the parser reads in the next Token from the
+tokenized program. The parsing is successful when there is no input remaining and the stack is empty. Any
+time there is an error that occurs when parsing (e.g. if nothing is returned from the parsing table lookup),
+then we throw a LL1ParseException with a string description of what went wrong. 
+
 # Code Output
 
 ## Tiny Grammar
